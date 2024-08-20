@@ -68,18 +68,25 @@ class IntesisBox(asyncio.Protocol):
         """asyncio callback for a successful connection."""
         _LOGGER.debug("Connected to IntesisBox")
         self._transport = transport
+        _ = asyncio.ensure_future(self.query_initial_state())
 
-        self._transport.write("ID\r".encode('ascii'))
-        await asyncio.sleep(1)
-        self._transport.write("LIMITS:SETPTEMP\r".encode('ascii'))
-        await asyncio.sleep(1)
-        self._transport.write("LIMITS:FANSP\r".encode('ascii'))
-        await asyncio.sleep(1)
-        self._transport.write("LIMITS:MODE\r".encode('ascii'))
-        await asyncio.sleep(1)
-        self._transport.write("LIMITS:VANEUD\r".encode('ascii'))
-        await asyncio.sleep(1)
-        self._transport.write("LIMITS:VANELR\r".encode('ascii'))
+    async def query_initial_state(self):
+        """Fetch configuration from the device upon connection."""
+        cmds = [
+            "ID",
+            "LIMITS:SETPTEMP",
+            "LIMITS:FANSP",
+            "LIMITS:MODE",
+            "LIMITS:VANEUD",
+            "LIMITS:VANELR",
+        ]
+        for cmd in cmds:
+            self._write(cmd)
+            await asyncio.sleep(1)
+
+    def _write(self, cmd):
+        self._transport.write(f"{cmd}\r".encode("ascii"))
+        _LOGGER.debug(f"Data sent: {cmd!r}")
 
     def data_received(self, data):
         """asyncio callback when data is received on the socket"""
