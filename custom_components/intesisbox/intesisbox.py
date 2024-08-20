@@ -348,4 +348,4 @@ class IntesisBox(asyncio.Protocol):
 
     async def keep_alive(self):
         """Send a keepalive command to reset it's watchdog timer."""
-        yield from asyncio.sleep(10, loop=self._eventLoop)
+        await asyncio.sleep(10, loop=self._eventLoop)
