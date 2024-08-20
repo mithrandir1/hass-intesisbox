@@ -70,15 +70,15 @@ class IntesisBox(asyncio.Protocol):
         self._transport = transport
 
         self._transport.write("ID\r".encode('ascii'))
-        sleep(1)
+        await asyncio.sleep(1)
         self._transport.write("LIMITS:SETPTEMP\r".encode('ascii'))
-        sleep(1)
+        await asyncio.sleep(1)
         self._transport.write("LIMITS:FANSP\r".encode('ascii'))
-        sleep(1)
+        await asyncio.sleep(1)
         self._transport.write("LIMITS:MODE\r".encode('ascii'))
-        sleep(1)
+        await asyncio.sleep(1)
         self._transport.write("LIMITS:VANEUD\r".encode('ascii'))
-        sleep(1)
+        await asyncio.sleep(1)
         self._transport.write("LIMITS:VANELR\r".encode('ascii'))
 
     def data_received(self, data):
@@ -346,7 +346,6 @@ class IntesisBox(asyncio.Protocol):
         """Public method to add a callback subscriber."""
         self._errorCallbacks.append(method)
 
-    @asyncio.coroutine
-    def keep_alive(self):
+    async def keep_alive(self):
         """Send a keepalive command to reset it's watchdog timer."""
         yield from asyncio.sleep(10, loop=self._eventLoop)
